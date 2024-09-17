@@ -1,0 +1,90 @@
+---
+title: "ass3"
+output: html_document
+date: "2024-09-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+spotify2023 <- read.csv("C:/Users/Jjtra/Desktop/spotify4220/spotify2023.csv")
+library(ggplot2)
+library(dplyr)
+```
+
+## Question 1
+
+First graph is an extremely simple histogram that looks at spotify chart rankings.
+In this graph, it is skewed right due to many songs being extremely high in
+both chart ranking and the frequency of those songs.
+
+
+```{r pressure, echo=FALSE}
+
+spotcharts <- spotify2023$in_spotify_charts
+hist(spotcharts, main='Spotify Charts', xlab='Number of songs in Spotify')
+```
+
+
+The second graph displays a scatter plot that compares chart rankings in 
+accordance to the perceived energy of the song. Energy in this case being 
+something like being very active/generating hype, not to be confused with 
+valence (positivity) and danceability. Each point is a song that shows both 
+the ranking and amount of energy. As you can see, many high ranking songs are 
+also high in energy.
+
+```{r}
+ggplot(spotify2023, aes(energy_.,in_spotify_charts)) + 
+  labs(title = "Energy and Spotify Chart Ranking", x = "Energy", y = "Chart Ranking") +
+  geom_point(aes(colour = 'red'))
+```
+
+## Question 2: Mean
+
+Below is a simple mean of energy of the most popular songs in Spotify 2023. 
+If you compare the mean to the previous graph, it does show that most songs 
+have the energy between 50 and 75, albeit, hard to exactly conclude. The 
+mean being 64 sort of supports this.
+
+```{r}
+energy_mean <- mean(spotify2023$energy_.)
+energy_mean
+```
+## Question 3: Correlation Test using Pearson
+
+I used the Pearson method to find correlation between the energy and dancbility 
+of songs. According to the results, the p-value for this test is less than 5%, 
+which means there is a correlation between the energy and danceability. In 
+other words, the energy percieved directly or closely interacts danceability 
+(ex. high energy means higher danceability of a song). This also rejects the 
+null hypothesis, which in this case was that energy and danceability has little 
+to no correalation.
+```{r}
+cor.test(spotify2023$danceability_.,spotify2023$energy_., method = 'pearson')
+```
+## Question 4: T-Test
+
+This is a 2 sample t-test between popular songs between the years 2016-2019 and 
+2020-2023. The hypothesis for this test is to see if more relevant songs have 
+more energy than pre-2020 songs. The Null Hypothesis in this case would be the 
+opposite, other wise meaning that pre-2020 songs have a higher energy 
+perception than the more relevent songs. The p-value in this case is just below 
+.05, which means that we can reject the null hypothesis. The mean value for x 
+(post-2020) is higher than y (pre-2020). As for the exact reason as to it is 
+significant why is unknown (could be due to key and mode).
+
+```{r}
+
+spotge2019 <- filter(spotify2023, released_year > 2019)
+spotle2016 <- filter(spotify2023, released_year <= 2019 & released_year >= 2016)
+t.test(spotge2019$energy_., spotle2016$energy_.)
+
+```
